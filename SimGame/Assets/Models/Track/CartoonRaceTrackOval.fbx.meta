@@ -3,7 +3,77 @@ guid: e405099f5f17ac944b5480501bdad18b
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: baloon
+    second: {fileID: 2100000, guid: eb4268287bb41cd4ea49702db1d06a50, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: banners
+    second: {fileID: 2100000, guid: 3853396f3fe9ca3479ca8f80062d7f33, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: barriers
+    second: {fileID: 2100000, guid: 5d693cc1627fc9d41997b9a555ca5d04, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence_metal
+    second: {fileID: 2100000, guid: 73491a55e43e93440af3f168edf9cf63, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: garages
+    second: {fileID: 2100000, guid: 2930ae7edbe8a88408926bc96786dbcf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: grass_1
+    second: {fileID: 2100000, guid: 8c40794f2f5899843ba354101dd1edb2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: grass_2
+    second: {fileID: 2100000, guid: 0cae31e094335f044bb10213462248cf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: gravel
+    second: {fileID: 2100000, guid: 1fed1b102a8e8ac4688b4afaa78f439b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: road
+    second: {fileID: 2100000, guid: 1c1101657bb1ffe449e0264d568a3bd7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rock
+    second: {fileID: 2100000, guid: e89f9043afd478944a995c0e9b800ac4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: startlights
+    second: {fileID: 2100000, guid: 68f4724d4ed10a9449c9c8501de6e2c5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: trees
+    second: {fileID: 2100000, guid: 35cc87845a7233d4e863a3f21327f5b3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tyres
+    second: {fileID: 2100000, guid: 3918c4d2c4e0e6c4181c6f7e6d45f490, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: white_line
+    second: {fileID: 2100000, guid: 91081165d99eb3549b71453191e77db0, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
