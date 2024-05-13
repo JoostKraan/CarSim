@@ -17,6 +17,9 @@ public class CarManager : MonoBehaviour
     public Transform wRR;
     public Transform wRL;
 
+    public Camera chaseCam;
+    public Camera rearFacingcam;
+
 
     [Header("Wheels Colliders")]
     [SerializeField] WheelCollider FrontRight;
@@ -36,6 +39,19 @@ public class CarManager : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            chaseCam.enabled = false;
+            rearFacingcam.enabled = true;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            chaseCam.enabled = true;
+            rearFacingcam.enabled = false;
+        }
     }
     private void FixedUpdate()
     {
