@@ -27,7 +27,13 @@ public class CarManager : MonoBehaviour
     [SerializeField] WheelCollider FrontLeft;
     [SerializeField] WheelCollider RearRight;
     [SerializeField] WheelCollider RearLeft;
-    
+
+    [Header("Gearing")]
+    [SerializeField] public float[] gearRatios = { 3.66f, 2.43f, 1.69f, 1.32f, 1.0f };
+    [SerializeField] private int maxGears = 5;
+    [SerializeField] private int currentGear = 1;
+    [SerializeField] private int maxRpm = 7200;
+    [SerializeField] private int currentRpm = 0;
 
     [Header("Car Stats")]
     [SerializeField] private float maxSpeed = 100f; // Adjust maximum speed
@@ -45,9 +51,31 @@ public class CarManager : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         
     }
+
+    private void CalcRpm()
+    {
+        currentGear = Mathf.Clamp(currentGear, 1, maxGears);
+
+        float wheelRpm = (RearLeft.rpm + RearRight.rpm) / 2f;
+        float finalDriveRatio = gearRatios[currentGear - 1]; // Get the gear ratio for the current gear
+
+        // Calculate engine RPM based on wheel speed and gear ratio
+        currentRpm = (int)(wheelRpm * finalDriveRatio * 60f);
+        if (currentRpm > maxRpm)
+        {
+            currentRpm = maxRpm;
+        }
+        else if (currentRpm < 0)
+        {
+            currentRpm = 0;
+        }
+    }
+
+
     private void Update()
     {
-
+        CalcRpm();
+        Debug.Log(currentRpm);
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             rearFacingcam.enabled = true;
