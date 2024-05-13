@@ -16,9 +16,11 @@ public class CarManager : MonoBehaviour
     public Transform wFL;
     public Transform wRR;
     public Transform wRL;
+    public Transform steeringWheel;
 
     public Camera chaseCam;
     public Camera rearFacingcam;
+    public Camera firstPersoncam;
 
 
     [Header("Wheels Colliders")]
@@ -51,6 +53,13 @@ public class CarManager : MonoBehaviour
         {
             chaseCam.enabled = true;
             rearFacingcam.enabled = false;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            firstPersoncam.enabled = true;
+            chaseCam.enabled = false;
+            rearFacingcam.enabled = false;
+           
         }
     }
     private void FixedUpdate()
