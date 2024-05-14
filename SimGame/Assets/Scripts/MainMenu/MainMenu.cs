@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
-    public GameObject mainMenu_Panel, CarEditor_Panel;
-    public Animator animator_Garage;
-    public Transform mainMenuPoint, garagePoint, mainCamera;
+    public GameObject mainMenu_Panel, carEditor_Panel, engineUpgrade_Panel;
+    public Animator animator_Garage, animator_HoodCar;
+    public Transform mainMenuPoint, garagePoint, enginePoint, mainCamera;
+    public Quaternion mainMenuRotation, garageRotation; // Nieuwe rotatiepunten voor de camera
     public float lerpSpeed = 0.5f;
 
     //Waar ben je in de main menu
@@ -16,47 +17,68 @@ public class MainMenu : MonoBehaviour
     void Start()
     {
         menuIndex = 0;
+        mainMenuRotation = mainCamera.rotation; // Oorspronkelijke rotatie
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void OnCar()
-	{
+    {
         animator_Garage.SetBool("Open/Close", true);
         mainMenu_Panel.SetActive(false);
-        StartCoroutine(LerpCamera(garagePoint.position));
+        StartCoroutine(LerpCamera(garagePoint.position, garageRotation)); // Lerpt naar de garage met nieuwe rotatie
         menuIndex = 1;
     }
 
     public void CarBackToMenu()
-	{
+    {
         animator_Garage.SetBool("Open/Close", false);
-        CarEditor_Panel.SetActive(false);
-        StartCoroutine(LerpCamera(mainMenuPoint.position));
+        carEditor_Panel.SetActive(false);
+        StartCoroutine(LerpCamera(mainMenuPoint.position, mainMenuRotation)); // Lerpt terug naar menu met oorspronkelijke rotatie
         menuIndex = 0;
     }
 
-    IEnumerator LerpCamera(Vector3 targetPosition)
+    public void OnEngineUpgrade()
+    {
+        animator_HoodCar.SetBool("Open/Close", true);
+        menuIndex = 2;
+        carEditor_Panel.SetActive(false);
+        StartCoroutine(LerpCamera(enginePoint.position, enginePoint.rotation)); // Lerpt naar enginePos met bijbehorende rotatie
+    }
+
+    public void BackFromEngineUpgrade()
+    {
+        animator_HoodCar.SetBool("Open/Close", false);
+        engineUpgrade_Panel.SetActive(false);
+        StartCoroutine(LerpCamera(garagePoint.position, garagePoint.rotation)); // Lerpt terug naar garage met bijbehorende rotatie
+        menuIndex = 1;
+    }
+
+    IEnumerator LerpCamera(Vector3 targetPosition, Quaternion targetRotation)
     {
         float elapsedTime = 0;
 
         Vector3 startingPos = mainCamera.position;
+        Quaternion startingRot = mainCamera.rotation;
 
         while (elapsedTime < lerpSpeed)
         {
             mainCamera.position = Vector3.Lerp(startingPos, targetPosition, (elapsedTime / lerpSpeed));
+            mainCamera.rotation = Quaternion.Lerp(startingRot, targetRotation, (elapsedTime / lerpSpeed)); // Lerpt de rotatie
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        if (menuIndex == 1) CarEditor_Panel.SetActive(true);
+        if (menuIndex == 1) carEditor_Panel.SetActive(true);
+        else if (menuIndex == 2) engineUpgrade_Panel.SetActive(true);
         else mainMenu_Panel.SetActive(true);
 
         mainCamera.position = targetPosition; // Zorg ervoor dat de positie exact is wanneer de lerp eindigt.
+        mainCamera.rotation = targetRotation; // Zorg ervoor dat de rotatie exact is wanneer de lerp eindigt.
     }
 
     public void OnQuit() => Application.Quit();
