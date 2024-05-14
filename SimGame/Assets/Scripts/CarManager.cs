@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -17,6 +18,17 @@ public class CarManager : MonoBehaviour
     public Transform wRR;
     public Transform wRL;
     public Transform steeringWheel;
+
+    [Header("Lights'")]
+    public bool lOn = true;
+    public Light flHeadlight;
+    public Light frHeadlight;
+    public Light flSpotlight;
+    public Light frSpotlight;
+
+    public Light rlTaillight;
+    public Light rrTaillight;
+
 
     public Camera chaseCam;
     public Camera rearFacingcam;
@@ -42,14 +54,19 @@ public class CarManager : MonoBehaviour
     [SerializeField] private float brakeTorque = 500f; // Adjust brake torque
     [SerializeField] private float handbrakeTorque = 1000f; // Adjust handbrake torque
     [SerializeField] private float maxTurnangle = 50f;
+    [SerializeField]private float currentTurnangle = 0f;
+
+    public float turnInput;
+    public float throttleInput;
+    
 
     Rigidbody rb;
-    public float throttleInput;
     private void Start()
     {
+         
         AdjustFrictionProperties();
         rb = GetComponent<Rigidbody>();
-        
+
     }
 
     private void CalcRpm()
@@ -74,14 +91,28 @@ public class CarManager : MonoBehaviour
 
     private void Update()
     {
+       
+        throttleInput = Input.GetAxis("Vertical");
+        ApplyThrottle(throttleInput);
+        turnInput = Input.GetAxis("Horizontal");
+        ApplyTurning(turnInput);
+
+
         CalcRpm();
-        Debug.Log(currentRpm);
+        ChangeCameraAngle();
+        UpdateLights();
+
+    }
+
+    private void ChangeCameraAngle()
+    {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             rearFacingcam.enabled = true;
             chaseCam.enabled = false;
             firstPersoncam.enabled = false;
             fendercam.enabled = false;
+
 
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -97,7 +128,7 @@ public class CarManager : MonoBehaviour
             fendercam.enabled = false;
             chaseCam.enabled = false;
             rearFacingcam.enabled = false;
-           
+
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
@@ -106,16 +137,39 @@ public class CarManager : MonoBehaviour
             firstPersoncam.enabled = false;
             chaseCam.enabled = false;
             rearFacingcam.enabled = false;
-            
 
         }
     }
-    private void FixedUpdate()
+    private void UpdateLights()
     {
-       
-        speed = rb.velocity.magnitude;
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            lOn = !lOn;
+            if (!lOn)
+            {
+                flHeadlight.intensity = 10.3f;
+                frHeadlight.intensity = 10.3f;
+                flSpotlight.intensity = 1;
+                frSpotlight.intensity = 1;
+                rlTaillight.intensity = 0.71f;
+                rrTaillight.intensity = 0.71f;
+            }
+            else
+            {
+                flHeadlight.intensity = 0;
+                frHeadlight.intensity = 0;
+                flSpotlight.intensity = 0;
+                frSpotlight.intensity = 0;
+                rlTaillight.intensity = 0;
+                rrTaillight.intensity = 0;
+            }
+        }
 
-        throttleInput = Input.GetAxis("Vertical");
+    }
+
+    private void ApplyThrottle(float throttleInput)
+    {
+        speed = rb.velocity.magnitude;
 
         if (throttleInput == 0 && speed <= 0.2f)
         {
@@ -131,13 +185,27 @@ public class CarManager : MonoBehaviour
         {
             float torque = accelerationRate * throttleInput;
             ApplyTorqueToWheels(torque);
+            
         }
         // Apply deceleration
         else if (throttleInput <= 0 && speed > 0)
         {
             float torque = -decelerationRate * Time.deltaTime;
+
             ApplyTorqueToWheels(torque);
         }
+    }
+    private void ApplyTurning(float turnAngle)
+    {
+        FrontLeft.steerAngle = turnAngle * maxTurnangle;
+        FrontRight.steerAngle = turnAngle * maxTurnangle;
+    }
+
+
+
+
+    private void FixedUpdate()
+    {
 
         // Apply braking
         if (Input.GetKey(KeyCode.Space))
@@ -153,12 +221,6 @@ public class CarManager : MonoBehaviour
             ReleaseBrake();
         }
 
-        // Apply steering
-        float turnAngle = maxTurnangle * Input.GetAxis("Horizontal");
-        FrontLeft.steerAngle = turnAngle;
-        FrontRight.steerAngle = turnAngle;
-
-        // Update wheel positions and rotations
         UpdateWheel(FrontLeft, wFL);
         UpdateWheel(FrontRight, wFR);
         UpdateWheel(RearLeft, wRL);
@@ -205,7 +267,7 @@ public class CarManager : MonoBehaviour
         trans.rotation = rotation;
     }
 
-    
+
     private void AdjustFrictionProperties()
     {
         WheelFrictionCurve forwardFriction = FrontRight.forwardFriction;
