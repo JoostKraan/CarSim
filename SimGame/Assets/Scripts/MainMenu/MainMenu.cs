@@ -5,9 +5,11 @@ using UnityEngine;
 public class MainMenu : MonoBehaviour
 {
     public GameObject mainMenu_Panel, carEditor_Panel, engineUpgrade_Panel;
+    public GameObject car_GameObject;
+    public GameObject menuCam, carCams;
     public Animator animator_Garage, animator_HoodCar;
-    public Transform mainMenuPoint, garagePoint, enginePoint, mainCamera;
-    public Quaternion mainMenuRotation, garageRotation; // Nieuwe rotatiepunten voor de camera
+    public Transform mainMenuPoint, garagePoint, enginePoint, car_StartPoint, mainCamera;
+    private Quaternion mainMenuRotation, garageRotation; // Nieuwe rotatiepunten voor de camera
     public float lerpSpeed = 0.5f;
 
     //Waar ben je in de main menu
@@ -80,6 +82,15 @@ public class MainMenu : MonoBehaviour
         mainCamera.position = targetPosition; // Zorg ervoor dat de positie exact is wanneer de lerp eindigt.
         mainCamera.rotation = targetRotation; // Zorg ervoor dat de rotatie exact is wanneer de lerp eindigt.
     }
+
+    public void OnPlay()
+	{
+        car_GameObject.transform.position = car_StartPoint.position;
+        car_GameObject.transform.rotation = car_StartPoint.rotation;
+        car_GameObject.GetComponent<CarManager>().enabled = true;
+        menuCam.SetActive(false);
+        carCams.SetActive(true);
+	}
 
     public void OnQuit() => Application.Quit();
 }
