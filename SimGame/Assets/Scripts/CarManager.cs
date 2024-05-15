@@ -55,7 +55,7 @@ public class CarManager : MonoBehaviour
     private float currentRpm = 0;
 
     [Header("Car Stats")]
-    [SerializeField] private float maxSpeed = 100f; // Adjust maximum speed
+    public static float maxSpeed = 100f; // Adjust maximum speed
     [SerializeField] private float accelerationRate = 500f; // Adjust acceleration rate
     [SerializeField] private float decelerationRate = 1000f; // Adjust deceleration rate
     [SerializeField] private float brakeTorque = 500f; // Adjust brake torque
@@ -73,7 +73,7 @@ public class CarManager : MonoBehaviour
 
         AdjustFrictionProperties();
         rb = GetComponent<Rigidbody>();
-
+        maxSpeed = 100;
     }
 
 
