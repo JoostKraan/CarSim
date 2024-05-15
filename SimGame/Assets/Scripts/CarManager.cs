@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CarManager : MonoBehaviour
 {
@@ -336,6 +337,7 @@ public class CarManager : MonoBehaviour
 
     private void ReleaseBrake()
     {
+        Brake.localRotation = Quaternion.Euler(new Vector3(-15.957f, -180,0));
         Debug.Log("tesdt");
         FrontLeft.wheelDampingRate = 0.25F;
         FrontRight.wheelDampingRate = 0.25F;
