@@ -15,6 +15,9 @@ public class MainMenu : MonoBehaviour
     //Waar ben je in de main menu
     private int menuIndex = 0;
 
+    //Ui sounds
+    public AudioSource clickSound, backOffSound, hoverSound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -93,4 +96,11 @@ public class MainMenu : MonoBehaviour
 	}
 
     public void OnQuit() => Application.Quit();
+
+    //Functies voor het spelen van sounds
+    public void ClickSound() => clickSound.Play();
+
+    public void HoverSound() => hoverSound.Play();
+
+    public void BackOffSound() => backOffSound.Play();
 }
