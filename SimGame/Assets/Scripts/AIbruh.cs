@@ -19,8 +19,6 @@ public class Aibruh : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        print(other.name);
-
         if (other.gameObject == checkpoints[CurTarget])
         {
             CurTarget++;
