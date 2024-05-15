@@ -38,6 +38,7 @@ public class CarManager : MonoBehaviour
     public Camera firstPersoncam;
     public Camera fendercam;
     public Camera PedalCam;
+    public Camera RearFenderCam;
     [Header("Wheels Colliders")]
     [SerializeField] WheelCollider FrontRight;
     [SerializeField] WheelCollider FrontLeft;
@@ -47,7 +48,7 @@ public class CarManager : MonoBehaviour
     [Header("Gearing")]
     public TextMeshProUGUI rpmText;
     public float[] gearRatios = { 3.66f, 2.43f, 1.69f, 1.32f, 1.0f };
-    [SerializeField] private int maxGears = 5;
+    [SerializeField] private int maxGears = 1;
     [SerializeField] private int currentGear = 1;
     private int maxRpm = 7200;
     private float currentRpm = 0;
@@ -89,15 +90,34 @@ public class CarManager : MonoBehaviour
 
     private void Gearing()
     {
-        currentRpm = (RearLeft.rpm * gearRatios[currentGear - 1] * 60) / (2 * Mathf.PI);
+        //currentRpm = (RearLeft.rpm * gearRatios[currentGear - 1] * 60) / (2 * Mathf.PI);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            if (currentGear > 1)
+            {
+                currentGear = 1;
+            }
+            currentGear++;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            if (currentGear < 0)
+            {
+                currentGear = 0;
+            }
+            currentGear--;
+        }
 
     }
+
 
     private void ChangeCameraAngle()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             rearFacingcam.enabled = true;
+            RearFenderCam.enabled = false;
             chaseCam.enabled = false;
             firstPersoncam.enabled = false;
             fendercam.enabled = false;
@@ -106,6 +126,7 @@ public class CarManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             chaseCam.enabled = true;
+            RearFenderCam.enabled = false;
             rearFacingcam.enabled = false;
             firstPersoncam.enabled = false;
             fendercam.enabled = false;
@@ -114,6 +135,7 @@ public class CarManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             firstPersoncam.enabled = true;
+            RearFenderCam.enabled = false;
             fendercam.enabled = false;
             chaseCam.enabled = false;
             rearFacingcam.enabled = false;
@@ -124,6 +146,7 @@ public class CarManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             fendercam.enabled = true;
+            RearFenderCam.enabled = false;
             firstPersoncam.enabled = false;
             chaseCam.enabled = false;
             rearFacingcam.enabled = false;
@@ -132,6 +155,16 @@ public class CarManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
             PedalCam.enabled = true;
+            RearFenderCam.enabled = false;
+            fendercam.enabled = false;
+            firstPersoncam.enabled = false;
+            chaseCam.enabled = false;
+            rearFacingcam.enabled = false;
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            RearFenderCam.enabled = true;
+            PedalCam.enabled = false;
             fendercam.enabled = false;
             firstPersoncam.enabled = false;
             chaseCam.enabled = false;
@@ -182,7 +215,15 @@ public class CarManager : MonoBehaviour
         if (throttleInput > 0 && speed < maxSpeed)
         {
             float torque = accelerationRate * throttleInput;
-            ApplyTorqueToWheels(torque);
+            if (currentGear >= 1)
+            {
+                ApplyForwardsTorque(torque);
+            }
+            if (currentGear == 0)
+            {
+                ApplyBackwardsTorque(torque);
+            }
+            
             PedalPressVisual(throttleInput);
 
 
@@ -192,7 +233,7 @@ public class CarManager : MonoBehaviour
         {
             float torque = -decelerationRate * Time.deltaTime;
 
-            ApplyTorqueToWheels(torque);
+            ApplyForwardsTorque(torque);
 
         }
     }
@@ -225,11 +266,9 @@ public class CarManager : MonoBehaviour
     }
     private void RotateSteeringWheel(float steerAngle)
     {
-        // Define a multiplier for the steering wheel rotation
-        // Adjust this value based on how much you want the steering wheel to rotate relative to the wheels
-        float steeringWheelRotationMultiplier = 10f;
+        float steeringWheelRotationMultiplier = 8f;
 
-        // Rotate the steering wheel around its local Y axis
+ 
         steeringWheel.localRotation = Quaternion.Euler(new Vector3(-15.957f, -180, steerAngle * steeringWheelRotationMultiplier));
     }
 
@@ -260,16 +299,28 @@ public class CarManager : MonoBehaviour
         UpdateWheel(RearRight, wRR);
     }
 
-    private void ApplyTorqueToWheels(float torque)
+    private void ApplyForwardsTorque(float torque)
     {
         FrontRight.motorTorque = torque;
         FrontLeft.motorTorque = torque;
         RearLeft.motorTorque = torque;
         RearRight.motorTorque = torque;
     }
+    private void ApplyBackwardsTorque(float torque)
+    {
+        FrontRight.motorTorque = -torque;
+        FrontLeft.motorTorque = -torque;
+        RearLeft.motorTorque = -torque;
+        RearRight.motorTorque = -torque;
+    }
 
     private void ApplyBrake()
     {
+        Debug.Log("tesdt");
+        FrontLeft.wheelDampingRate = 10;
+        FrontRight.wheelDampingRate = 10;
+        RearRight.wheelDampingRate = 10;
+        RearLeft.wheelDampingRate = 10;
         FrontRight.brakeTorque = brakeTorque;
         FrontLeft.brakeTorque = brakeTorque;
         RearRight.brakeTorque = brakeTorque;
@@ -285,6 +336,11 @@ public class CarManager : MonoBehaviour
 
     private void ReleaseBrake()
     {
+        Debug.Log("tesdt");
+        FrontLeft.wheelDampingRate = 0.25F;
+        FrontRight.wheelDampingRate = 0.25F;
+        RearRight.wheelDampingRate = 0.25F;
+        RearLeft.wheelDampingRate = 0.25F;
         FrontRight.brakeTorque = 0f;
         FrontLeft.brakeTorque = 0f;
         RearRight.brakeTorque = 0f;
