@@ -104,7 +104,7 @@ public class CarManager : MonoBehaviour
 
     }
 
-    private void ChangeCameraAngle()
+    public void ChangeCameraAngle()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -140,7 +140,7 @@ public class CarManager : MonoBehaviour
 
         }
     }
-    private void UpdateLights()
+    public void UpdateLights()
     {
         if (Input.GetKeyDown(KeyCode.H))
         {
@@ -167,7 +167,7 @@ public class CarManager : MonoBehaviour
 
     }
 
-    private void ApplyThrottle(float throttleInput)
+    public void ApplyThrottle(float throttleInput)
     {
         speed = rb.velocity.magnitude;
 

@@ -14,7 +14,7 @@ public class Aibruh : MonoBehaviour
 
     void Update()
     {
-        transform.position = Vector3.MoveTowards(transform.position, checkpoints[CurTarget].transform.position, 10 * Time.deltaTime);
+        
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,5 +30,4 @@ public class Aibruh : MonoBehaviour
             }
         }
     }
-
 }
