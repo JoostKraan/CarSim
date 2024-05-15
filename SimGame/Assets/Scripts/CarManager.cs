@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -18,6 +19,8 @@ public class CarManager : MonoBehaviour
     public Transform wRR;
     public Transform wRL;
     public Transform steeringWheel;
+    public Transform Accelerator;
+    public Transform Brake;
 
     [Header("Lights'")]
     public bool lOn = true;
@@ -34,6 +37,8 @@ public class CarManager : MonoBehaviour
     public Camera rearFacingcam;
     public Camera firstPersoncam;
     public Camera fendercam;
+    public Camera PedalCam;
+    public Camera RearFenderCam;
     [Header("Wheels Colliders")]
     [SerializeField] WheelCollider FrontRight;
     [SerializeField] WheelCollider FrontLeft;
@@ -41,11 +46,12 @@ public class CarManager : MonoBehaviour
     [SerializeField] WheelCollider RearLeft;
 
     [Header("Gearing")]
-    [SerializeField] public float[] gearRatios = { 3.66f, 2.43f, 1.69f, 1.32f, 1.0f };
-    [SerializeField] private int maxGears = 5;
+    public TextMeshProUGUI rpmText;
+    public float[] gearRatios = { 3.66f, 2.43f, 1.69f, 1.32f, 1.0f };
+    [SerializeField] private int maxGears = 1;
     [SerializeField] private int currentGear = 1;
-    [SerializeField] private int maxRpm = 7200;
-    [SerializeField] private int currentRpm = 0;
+    private int maxRpm = 7200;
+    private float currentRpm = 0;
 
     [Header("Car Stats")]
     [SerializeField] private float maxSpeed = 100f; // Adjust maximum speed
@@ -54,90 +60,115 @@ public class CarManager : MonoBehaviour
     [SerializeField] private float brakeTorque = 500f; // Adjust brake torque
     [SerializeField] private float handbrakeTorque = 1000f; // Adjust handbrake torque
     [SerializeField] private float maxTurnangle = 50f;
-    [SerializeField]private float currentTurnangle = 0f;
+    [SerializeField] private float currentTurnangle = 0f;
 
     public float turnInput;
     public float throttleInput;
-    
+
 
     Rigidbody rb;
     private void Start()
     {
-         
+
         AdjustFrictionProperties();
         rb = GetComponent<Rigidbody>();
 
     }
 
-    private void CalcRpm()
-    {
-        currentGear = Mathf.Clamp(currentGear, 1, maxGears);
-
-        float wheelRpm = (RearLeft.rpm + RearRight.rpm) / 2f;
-        float finalDriveRatio = gearRatios[currentGear - 1]; // Get the gear ratio for the current gear
-
-        // Calculate engine RPM based on wheel speed and gear ratio
-        currentRpm = (int)(wheelRpm * finalDriveRatio * 60f);
-        if (currentRpm > maxRpm)
-        {
-            currentRpm = maxRpm;
-        }
-        else if (currentRpm < 0)
-        {
-            currentRpm = 0;
-        }
-    }
-
 
     private void Update()
     {
-       
+        rpmText.text = $"RPM  {RearLeft.rpm.ToString("F1")}";
         throttleInput = Input.GetAxis("Vertical");
         ApplyThrottle(throttleInput);
         turnInput = Input.GetAxis("Horizontal");
         ApplyTurning(turnInput);
-
-
-        CalcRpm();
         ChangeCameraAngle();
         UpdateLights();
+        Gearing();
+    }
+
+    private void Gearing()
+    {
+        //currentRpm = (RearLeft.rpm * gearRatios[currentGear - 1] * 60) / (2 * Mathf.PI);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            if (currentGear > 1)
+            {
+                currentGear = 1;
+            }
+            currentGear++;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            if (currentGear < 0)
+            {
+                currentGear = 0;
+            }
+            currentGear--;
+        }
 
     }
+
 
     private void ChangeCameraAngle()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             rearFacingcam.enabled = true;
+            RearFenderCam.enabled = false;
             chaseCam.enabled = false;
             firstPersoncam.enabled = false;
             fendercam.enabled = false;
-
-
+            PedalCam.enabled = false;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             chaseCam.enabled = true;
+            RearFenderCam.enabled = false;
             rearFacingcam.enabled = false;
             firstPersoncam.enabled = false;
             fendercam.enabled = false;
+            PedalCam.enabled = false;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             firstPersoncam.enabled = true;
+            RearFenderCam.enabled = false;
             fendercam.enabled = false;
             chaseCam.enabled = false;
             rearFacingcam.enabled = false;
+            PedalCam.enabled = false;
 
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             fendercam.enabled = true;
+            RearFenderCam.enabled = false;
             firstPersoncam.enabled = false;
             chaseCam.enabled = false;
             rearFacingcam.enabled = false;
-
+            PedalCam.enabled = false;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            PedalCam.enabled = true;
+            RearFenderCam.enabled = false;
+            fendercam.enabled = false;
+            firstPersoncam.enabled = false;
+            chaseCam.enabled = false;
+            rearFacingcam.enabled = false;
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            RearFenderCam.enabled = true;
+            PedalCam.enabled = false;
+            fendercam.enabled = false;
+            firstPersoncam.enabled = false;
+            chaseCam.enabled = false;
+            rearFacingcam.enabled = false;
         }
     }
     private void UpdateLights()
@@ -184,22 +215,63 @@ public class CarManager : MonoBehaviour
         if (throttleInput > 0 && speed < maxSpeed)
         {
             float torque = accelerationRate * throttleInput;
-            ApplyTorqueToWheels(torque);
+            if (currentGear >= 1)
+            {
+                ApplyForwardsTorque(torque);
+            }
+            if (currentGear == 0)
+            {
+                ApplyBackwardsTorque(torque);
+            }
             
+            PedalPressVisual(throttleInput);
+
+
         }
         // Apply deceleration
         else if (throttleInput <= 0 && speed > 0)
         {
             float torque = -decelerationRate * Time.deltaTime;
 
-            ApplyTorqueToWheels(torque);
+            ApplyForwardsTorque(torque);
+
         }
+    }
+    private void PedalPressVisual(float throttleInput)
+    {
+        Quaternion acceleratorPedalStartRotation = Quaternion.Euler(new Vector3(0, 180f, 0f));
+        Quaternion acceleratorPedalEndRotation = Quaternion.Euler(new Vector3(-25, 180f, 0f));
+        Accelerator.localRotation = Quaternion.Lerp(acceleratorPedalStartRotation, acceleratorPedalEndRotation, throttleInput);
+    }
+    private void BrakePedalVisual()
+    {
+        float brakeInput = -Input.GetAxis("Vertical");
+        Quaternion BrakePedalStartRotation = Quaternion.Euler(new Vector3(0, 180f, 0f));
+        Quaternion BrakePedalEndRotation = Quaternion.Euler(new Vector3(-25, 180f, 0f));
+        
+        Brake.localRotation = Quaternion.Lerp(BrakePedalStartRotation, BrakePedalEndRotation, brakeInput);
+
     }
     private void ApplyTurning(float turnAngle)
     {
-        FrontLeft.steerAngle = turnAngle * maxTurnangle;
-        FrontRight.steerAngle = turnAngle * maxTurnangle;
+        // Calculate the steer angle for the wheels
+        float steerAngle = turnAngle * maxTurnangle;
+
+        // Apply the steer angle to the front wheels
+        FrontLeft.steerAngle = steerAngle;
+        FrontRight.steerAngle = steerAngle;
+
+        // Rotate the steering wheel based on the steer angle
+        RotateSteeringWheel(steerAngle);
     }
+    private void RotateSteeringWheel(float steerAngle)
+    {
+        float steeringWheelRotationMultiplier = 8f;
+
+ 
+        steeringWheel.localRotation = Quaternion.Euler(new Vector3(-15.957f, -180, steerAngle * steeringWheelRotationMultiplier));
+    }
+
 
 
 
@@ -227,20 +299,33 @@ public class CarManager : MonoBehaviour
         UpdateWheel(RearRight, wRR);
     }
 
-    private void ApplyTorqueToWheels(float torque)
+    private void ApplyForwardsTorque(float torque)
     {
         FrontRight.motorTorque = torque;
         FrontLeft.motorTorque = torque;
         RearLeft.motorTorque = torque;
         RearRight.motorTorque = torque;
     }
+    private void ApplyBackwardsTorque(float torque)
+    {
+        FrontRight.motorTorque = -torque;
+        FrontLeft.motorTorque = -torque;
+        RearLeft.motorTorque = -torque;
+        RearRight.motorTorque = -torque;
+    }
 
     private void ApplyBrake()
     {
+        Debug.Log("tesdt");
+        FrontLeft.wheelDampingRate = 10;
+        FrontRight.wheelDampingRate = 10;
+        RearRight.wheelDampingRate = 10;
+        RearLeft.wheelDampingRate = 10;
         FrontRight.brakeTorque = brakeTorque;
         FrontLeft.brakeTorque = brakeTorque;
         RearRight.brakeTorque = brakeTorque;
         RearLeft.brakeTorque = brakeTorque;
+        BrakePedalVisual();
     }
 
     private void ApplyHandbrake()
@@ -251,6 +336,11 @@ public class CarManager : MonoBehaviour
 
     private void ReleaseBrake()
     {
+        Debug.Log("tesdt");
+        FrontLeft.wheelDampingRate = 0.25F;
+        FrontRight.wheelDampingRate = 0.25F;
+        RearRight.wheelDampingRate = 0.25F;
+        RearLeft.wheelDampingRate = 0.25F;
         FrontRight.brakeTorque = 0f;
         FrontLeft.brakeTorque = 0f;
         RearRight.brakeTorque = 0f;
