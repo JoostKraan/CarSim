@@ -61,7 +61,7 @@ public class CarManager : MonoBehaviour
     
 
     Rigidbody rb;
-    private void Start()
+    public void Start()
     {
          
         AdjustFrictionProperties();
@@ -69,7 +69,7 @@ public class CarManager : MonoBehaviour
 
     }
 
-    private void CalcRpm()
+    public void CalcRpm()
     {
         currentGear = Mathf.Clamp(currentGear, 1, maxGears);
 
@@ -91,17 +91,7 @@ public class CarManager : MonoBehaviour
 
     private void Update()
     {
-       
-        throttleInput = Input.GetAxis("Vertical");
-        ApplyThrottle(throttleInput);
-        turnInput = Input.GetAxis("Horizontal");
-        ApplyTurning(turnInput);
-
-
-        CalcRpm();
-        ChangeCameraAngle();
-        UpdateLights();
-
+    
     }
 
     public void ChangeCameraAngle()
@@ -195,7 +185,7 @@ public class CarManager : MonoBehaviour
             ApplyTorqueToWheels(torque);
         }
     }
-    private void ApplyTurning(float turnAngle)
+    public void ApplyTurning(float turnAngle)
     {
         FrontLeft.steerAngle = turnAngle * maxTurnangle;
         FrontRight.steerAngle = turnAngle * maxTurnangle;
@@ -204,7 +194,7 @@ public class CarManager : MonoBehaviour
 
 
 
-    private void FixedUpdate()
+    public void FixedUpdate()
     {
 
         // Apply braking
@@ -227,7 +217,7 @@ public class CarManager : MonoBehaviour
         UpdateWheel(RearRight, wRR);
     }
 
-    private void ApplyTorqueToWheels(float torque)
+    public void ApplyTorqueToWheels(float torque)
     {
         FrontRight.motorTorque = torque;
         FrontLeft.motorTorque = torque;
@@ -235,7 +225,7 @@ public class CarManager : MonoBehaviour
         RearRight.motorTorque = torque;
     }
 
-    private void ApplyBrake()
+    public void ApplyBrake()
     {
         FrontRight.brakeTorque = brakeTorque;
         FrontLeft.brakeTorque = brakeTorque;
@@ -243,13 +233,13 @@ public class CarManager : MonoBehaviour
         RearLeft.brakeTorque = brakeTorque;
     }
 
-    private void ApplyHandbrake()
+    public void ApplyHandbrake()
     {
         RearRight.brakeTorque = handbrakeTorque;
         RearLeft.brakeTorque = handbrakeTorque;
     }
 
-    private void ReleaseBrake()
+    public void ReleaseBrake()
     {
         FrontRight.brakeTorque = 0f;
         FrontLeft.brakeTorque = 0f;
@@ -257,7 +247,7 @@ public class CarManager : MonoBehaviour
         RearLeft.brakeTorque = 0f;
     }
 
-    private void UpdateWheel(WheelCollider col, Transform trans)
+    public void UpdateWheel(WheelCollider col, Transform trans)
     {
         Vector3 position;
         Quaternion rotation;
@@ -268,7 +258,7 @@ public class CarManager : MonoBehaviour
     }
 
 
-    private void AdjustFrictionProperties()
+    public void AdjustFrictionProperties()
     {
         WheelFrictionCurve forwardFriction = FrontRight.forwardFriction;
         WheelFrictionCurve sidewaysFriction = FrontRight.sidewaysFriction;
