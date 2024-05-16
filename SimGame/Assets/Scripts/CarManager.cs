@@ -5,10 +5,10 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class CarManager : MonoBehaviour
 {
-
     [Header("States")]
     [SerializeField] public bool canDrive = false;
     [SerializeField] private bool engineRunning = false;
@@ -24,7 +24,7 @@ public class CarManager : MonoBehaviour
     public Transform Brake;
 
     [Header("Lights'")]
-    public bool lOn = true;
+    public bool lOn = false;
     public Light flHeadlight;
     public Light frHeadlight;
     public Light flSpotlight;
@@ -33,13 +33,15 @@ public class CarManager : MonoBehaviour
     public Light rlTaillight;
     public Light rrTaillight;
 
-
+    private Camera[] cameras;
     public Camera chaseCam;
     public Camera rearFacingcam;
     public Camera firstPersoncam;
     public Camera fendercam;
     public Camera PedalCam;
     public Camera RearFenderCam;
+    private int currentCameraIndex = 0;
+
     [Header("Wheels Colliders")]
     [SerializeField] WheelCollider FrontRight;
     [SerializeField] WheelCollider FrontLeft;
@@ -62,38 +64,64 @@ public class CarManager : MonoBehaviour
     [SerializeField] private float handbrakeTorque = 1000f; // Adjust handbrake torque
     [SerializeField] private float maxTurnangle = 50f;
     [SerializeField] private float currentTurnangle = 0f;
+    public bool controllerConnected;
+    public bool isKeyPressed = false;
+    bool ispressed;
 
+    float GetForward() => playerInput.actions["Throttle"].ReadValue<float>();
+    float GetBrake() => playerInput.actions["Brake"].ReadValue<float>();
+    float GetShiftUp() => playerInput.actions["ShiftUp"].ReadValue<float>();
+    float GetShiftDown() => playerInput.actions["ShiftDown"].ReadValue<float>();
+    float GetCamera() => playerInput.actions["Camera"].ReadValue<float>();
+    float GetLights() => playerInput.actions["Lights"].ReadValue<float>();
+
+    [SerializeField] private PlayerInput playerInput;
     public float turnInput;
     public float throttleInput;
 
-
     Rigidbody rb;
+
+    private float cameraSwitchCooldown = 0.5f; // Cooldown period in seconds
+    private float cameraSwitchTimestamp;
+
     private void Start()
     {
-
+        cameras = new Camera[] { rearFacingcam, chaseCam, firstPersoncam, fendercam, PedalCam, RearFenderCam };
+        UpdateCamera();
         AdjustFrictionProperties();
         rb = GetComponent<Rigidbody>();
-
     }
-
 
     private void Update()
     {
+        if (GetCamera() > 0 && Time.time > cameraSwitchTimestamp)
+        {
+            cameraSwitchTimestamp = Time.time + cameraSwitchCooldown;
+            currentCameraIndex = (currentCameraIndex + 1) % cameras.Length;
+            UpdateCamera();
+        }
+
         rpmText.text = $"RPM  {RearLeft.rpm.ToString("F1")}";
-        throttleInput = Input.GetAxis("Vertical");
+
+        if (controllerConnected)
+        {
+            throttleInput = GetForward();
+        }
+        else
+        {
+            throttleInput = Input.GetAxis("Vertical");
+        }
+
         ApplyThrottle(throttleInput);
         turnInput = Input.GetAxis("Horizontal");
         ApplyTurning(turnInput);
-        ChangeCameraAngle();
         UpdateLights();
         Gearing();
     }
 
     private void Gearing()
     {
-        //currentRpm = (RearLeft.rpm * gearRatios[currentGear - 1] * 60) / (2 * Mathf.PI);
-
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) || GetShiftUp() > 0)
         {
             if (currentGear > 1)
             {
@@ -101,7 +129,7 @@ public class CarManager : MonoBehaviour
             }
             currentGear++;
         }
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.LeftControl) || GetShiftDown() > 0)
         {
             if (currentGear < 0)
             {
@@ -109,76 +137,27 @@ public class CarManager : MonoBehaviour
             }
             currentGear--;
         }
-
     }
 
-
-    private void ChangeCameraAngle()
+    void UpdateCamera()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        for (int i = 0; i < cameras.Length; i++)
         {
-            rearFacingcam.enabled = true;
-            RearFenderCam.enabled = false;
-            chaseCam.enabled = false;
-            firstPersoncam.enabled = false;
-            fendercam.enabled = false;
-            PedalCam.enabled = false;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            chaseCam.enabled = true;
-            RearFenderCam.enabled = false;
-            rearFacingcam.enabled = false;
-            firstPersoncam.enabled = false;
-            fendercam.enabled = false;
-            PedalCam.enabled = false;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            firstPersoncam.enabled = true;
-            RearFenderCam.enabled = false;
-            fendercam.enabled = false;
-            chaseCam.enabled = false;
-            rearFacingcam.enabled = false;
-            PedalCam.enabled = false;
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            fendercam.enabled = true;
-            RearFenderCam.enabled = false;
-            firstPersoncam.enabled = false;
-            chaseCam.enabled = false;
-            rearFacingcam.enabled = false;
-            PedalCam.enabled = false;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            PedalCam.enabled = true;
-            RearFenderCam.enabled = false;
-            fendercam.enabled = false;
-            firstPersoncam.enabled = false;
-            chaseCam.enabled = false;
-            rearFacingcam.enabled = false;
-        }
-        if(Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            RearFenderCam.enabled = true;
-            PedalCam.enabled = false;
-            fendercam.enabled = false;
-            firstPersoncam.enabled = false;
-            chaseCam.enabled = false;
-            rearFacingcam.enabled = false;
+            cameras[i].enabled = (i == currentCameraIndex);
         }
     }
+
     private void UpdateLights()
     {
-        if (Input.GetKeyDown(KeyCode.H))
+        
+        if (Input.GetKeyDown(KeyCode.H) || GetLights() > 0 && ispressed)
         {
+            
+            Debug.Log(GetLights());
             lOn = !lOn;
             if (!lOn)
             {
+                
                 flHeadlight.intensity = 10.3f;
                 frHeadlight.intensity = 10.3f;
                 flSpotlight.intensity = 1;
@@ -186,6 +165,7 @@ public class CarManager : MonoBehaviour
                 rlTaillight.intensity = 0.71f;
                 rrTaillight.intensity = 0.71f;
             }
+            
             else
             {
                 flHeadlight.intensity = 0;
@@ -196,12 +176,10 @@ public class CarManager : MonoBehaviour
                 rrTaillight.intensity = 0;
             }
         }
-
     }
 
     private void ApplyThrottle(float throttleInput)
     {
-        Debug.Log(throttleInput);
         speed = rb.velocity.magnitude;
 
         if (throttleInput == 0 && speed <= 0.2f)
@@ -213,7 +191,6 @@ public class CarManager : MonoBehaviour
             rb.drag = 0.005f;
         }
 
-        // Apply acceleration
         if (throttleInput > 0 && speed < maxSpeed)
         {
             float torque = accelerationRate * throttleInput;
@@ -225,68 +202,55 @@ public class CarManager : MonoBehaviour
             {
                 ApplyBackwardsTorque(torque);
             }
-            
+
             PedalPressVisual(throttleInput);
-
-
         }
-        // Apply deceleration
         else if (throttleInput <= 0 && speed > 0)
         {
             float torque = -decelerationRate * Time.deltaTime;
-
             ApplyForwardsTorque(torque);
-
         }
     }
+
     private void PedalPressVisual(float throttleInput)
     {
         Quaternion acceleratorPedalStartRotation = Quaternion.Euler(new Vector3(0, 180f, 0f));
         Quaternion acceleratorPedalEndRotation = Quaternion.Euler(new Vector3(-25, 180f, 0f));
         Accelerator.localRotation = Quaternion.Lerp(acceleratorPedalStartRotation, acceleratorPedalEndRotation, throttleInput);
     }
+
     private void BrakePedalVisual()
     {
         float brakeInput = -Input.GetAxis("Vertical");
         Quaternion BrakePedalStartRotation = Quaternion.Euler(new Vector3(0, 180f, 0f));
         Quaternion BrakePedalEndRotation = Quaternion.Euler(new Vector3(-25, 180f, 0f));
-        
-        Brake.localRotation = Quaternion.Lerp(BrakePedalStartRotation, BrakePedalEndRotation, brakeInput);
 
+        Brake.localRotation = Quaternion.Lerp(BrakePedalStartRotation, BrakePedalEndRotation, brakeInput);
     }
+
     private void ApplyTurning(float turnAngle)
     {
-        // Calculate the steer angle for the wheels
         float steerAngle = turnAngle * maxTurnangle;
 
-        // Apply the steer angle to the front wheels
         FrontLeft.steerAngle = steerAngle;
         FrontRight.steerAngle = steerAngle;
 
-        // Rotate the steering wheel based on the steer angle
         RotateSteeringWheel(steerAngle);
     }
+
     private void RotateSteeringWheel(float steerAngle)
     {
         float steeringWheelRotationMultiplier = 8f;
-
- 
         steeringWheel.localRotation = Quaternion.Euler(new Vector3(-15.957f, -180, steerAngle * steeringWheelRotationMultiplier));
     }
 
-
-
-
-
     private void FixedUpdate()
     {
-
-        // Apply braking
         if (Input.GetKey(KeyCode.Space))
         {
             ApplyHandbrake();
         }
-        else if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.S) || GetBrake() > 0)
         {
             ApplyBrake();
         }
@@ -308,6 +272,7 @@ public class CarManager : MonoBehaviour
         RearLeft.motorTorque = torque;
         RearRight.motorTorque = torque;
     }
+
     private void ApplyBackwardsTorque(float torque)
     {
         FrontRight.motorTorque = -torque;
@@ -318,7 +283,6 @@ public class CarManager : MonoBehaviour
 
     private void ApplyBrake()
     {
-        Debug.Log("tesdt");
         FrontLeft.wheelDampingRate = 10;
         FrontRight.wheelDampingRate = 10;
         RearRight.wheelDampingRate = 10;
@@ -338,8 +302,7 @@ public class CarManager : MonoBehaviour
 
     private void ReleaseBrake()
     {
-        Brake.localRotation = Quaternion.Euler(new Vector3(-15.957f, -180,0));
-        Debug.Log("tesdt");
+        Brake.localRotation = Quaternion.Euler(new Vector3(-15.957f, -180, 0));
         FrontLeft.wheelDampingRate = 0.25F;
         FrontRight.wheelDampingRate = 0.25F;
         RearRight.wheelDampingRate = 0.25F;
@@ -360,17 +323,14 @@ public class CarManager : MonoBehaviour
         trans.rotation = rotation;
     }
 
-
     private void AdjustFrictionProperties()
     {
         WheelFrictionCurve forwardFriction = FrontRight.forwardFriction;
         WheelFrictionCurve sidewaysFriction = FrontRight.sidewaysFriction;
 
-        // Increase grip by adjusting the stiffness of the friction curves
         forwardFriction.stiffness = 1; // Increase forward grip
         sidewaysFriction.stiffness = 1; // Increase sideways grip
 
-        // Apply the adjusted friction curves to all wheels
         FrontRight.forwardFriction = forwardFriction;
         FrontLeft.forwardFriction = forwardFriction;
         RearRight.forwardFriction = forwardFriction;
@@ -381,13 +341,4 @@ public class CarManager : MonoBehaviour
         RearRight.sidewaysFriction = sidewaysFriction;
         RearLeft.sidewaysFriction = sidewaysFriction;
     }
-
-
-
 }
-
-
-
-
-
-
