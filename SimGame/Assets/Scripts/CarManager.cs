@@ -6,11 +6,16 @@ using UnityEngine;
 
 public class CarManager : MonoBehaviour
 {
+    [Header("Laps")]
+    public List<GameObject> checkpoints;
+    public int CurTarget;
+    public int lap;
 
     [Header("States")]
     [SerializeField] public bool canDrive = false;
     [SerializeField] private bool engineRunning = false;
     [SerializeField] public float speed;
+    [SerializeField] private bool isPlayer;
 
     [Header("Transforms")]
     public Transform wFR;
@@ -51,13 +56,15 @@ public class CarManager : MonoBehaviour
     [SerializeField] private float maxSpeed = 100f; // Adjust maximum speed
     [SerializeField] private float accelerationRate = 500f; // Adjust acceleration rate
     [SerializeField] private float decelerationRate = 1000f; // Adjust deceleration rate
-    [SerializeField] private float brakeTorque = 500f; // Adjust brake torque
-    [SerializeField] private float handbrakeTorque = 1000f; // Adjust handbrake torque
+    [SerializeField] private float brakeTorque = 1000f; // Adjust brake torque
+    [SerializeField] private float handbrakeTorque = 2000f; // Adjust handbrake torque
     [SerializeField] private float maxTurnangle = 50f;
     [SerializeField]private float currentTurnangle = 0f;
 
     public float turnInput;
     public float throttleInput;
+
+    float targetRotationState;
     
 
     internal Rigidbody rb;
@@ -94,48 +101,64 @@ public class CarManager : MonoBehaviour
 
     private void Update()
     {
-    
+        if (isPlayer)
+        {
+            CalcRpm();
+            ChangeCameraAngle();
+            UpdateLights();
+
+            turnInput = Input.GetAxisRaw("Horizontal");
+            throttleInput = Input.GetAxisRaw("Vertical");
+
+            targetRotationState = Mathf.Lerp(targetRotationState, turnInput, Time.deltaTime * 5);
+
+            ApplyThrottle(throttleInput);
+            ApplyTurning(targetRotationState);
+        }
     }
 
     public void ChangeCameraAngle()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (isPlayer)
         {
-            rearFacingcam.enabled = true;
-            chaseCam.enabled = false;
-            firstPersoncam.enabled = false;
-            fendercam.enabled = false;
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                rearFacingcam.enabled = true;
+                chaseCam.enabled = false;
+                firstPersoncam.enabled = false;
+                fendercam.enabled = false;
 
 
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            chaseCam.enabled = true;
-            rearFacingcam.enabled = false;
-            firstPersoncam.enabled = false;
-            fendercam.enabled = false;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            firstPersoncam.enabled = true;
-            fendercam.enabled = false;
-            chaseCam.enabled = false;
-            rearFacingcam.enabled = false;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                chaseCam.enabled = true;
+                rearFacingcam.enabled = false;
+                firstPersoncam.enabled = false;
+                fendercam.enabled = false;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                firstPersoncam.enabled = true;
+                fendercam.enabled = false;
+                chaseCam.enabled = false;
+                rearFacingcam.enabled = false;
 
-        }
+            }
 
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            fendercam.enabled = true;
-            firstPersoncam.enabled = false;
-            chaseCam.enabled = false;
-            rearFacingcam.enabled = false;
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                fendercam.enabled = true;
+                firstPersoncam.enabled = false;
+                chaseCam.enabled = false;
+                rearFacingcam.enabled = false;
 
+            }
         }
     }
     public void UpdateLights()
     {
-        if (Input.GetKeyDown(KeyCode.H))
+        if (Input.GetKeyDown(KeyCode.H) && isPlayer)
         {
             lOn = !lOn;
             if (!lOn)
