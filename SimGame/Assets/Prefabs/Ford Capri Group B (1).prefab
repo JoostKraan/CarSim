@@ -1420,7 +1420,6 @@ GameObject:
   m_Component:
   - component: {fileID: 962010590090091665}
   - component: {fileID: 1641196762997994379}
-  - component: {fileID: 8169951783167506997}
   - component: {fileID: 7511802059309950667}
   m_Layer: 0
   m_Name: Ford Capri Group B (1)
@@ -1513,59 +1512,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8169951783167506997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1669916686475216870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27f3d5e0dacd92b4aa42ec6b70c982ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canDrive: 1
-  engineRunning: 1
-  speed: 0
-  wFR: {fileID: 162517916678574232}
-  wFL: {fileID: 6808942065742629100}
-  wRR: {fileID: 2131667573965726813}
-  wRL: {fileID: 5447244473016839316}
-  steeringWheel: {fileID: 847540204344726}
-  lOn: 1
-  flHeadlight: {fileID: 2624487041291844143}
-  frHeadlight: {fileID: 3423839635353783568}
-  flSpotlight: {fileID: 2347562313771180267}
-  frSpotlight: {fileID: 7692634863777262203}
-  rlTaillight: {fileID: 3561451029807495323}
-  rrTaillight: {fileID: 552919306940016975}
-  chaseCam: {fileID: 7721028398160126065}
-  rearFacingcam: {fileID: 6545758899615842868}
-  firstPersoncam: {fileID: 8233127052187607011}
-  fendercam: {fileID: 8696378463729523969}
-  FrontRight: {fileID: 6235240565525597419}
-  FrontLeft: {fileID: 5922143774808445658}
-  RearRight: {fileID: 5714230077396816918}
-  RearLeft: {fileID: 5489088998446113656}
-  gearRatios:
-  - 3.66
-  - 2.43
-  - 1.69
-  - 1.32
-  - 1
-  maxGears: 5
-  currentGear: 1
-  maxRpm: 7200
-  currentRpm: 0
-  maxSpeed: 100
-  accelerationRate: 800
-  decelerationRate: 1000
-  brakeTorque: 500
-  handbrakeTorque: 1000
-  maxTurnangle: 45
-  throttleInput: 0
-  turnAngle: 0
 --- !u!65 &7511802059309950667
 BoxCollider:
   m_ObjectHideFlags: 0
