@@ -7,13 +7,13 @@ using UnityEngine.UIElements;
 public class Aibruh : CarManager
 {
     public GameObject[] checkpoints;
-    public float speed;
+ 
     float angle;
-    public Rigidbody rb;
     [SerializeField] int CurTarget;
     public float gasinput;
     void Start()
     {
+        Init();
         gasinput = 1;
     }
 

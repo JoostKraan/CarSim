@@ -60,13 +60,16 @@ public class CarManager : MonoBehaviour
     public float throttleInput;
     
 
-    Rigidbody rb;
-    public void Start()
+    internal Rigidbody rb;
+    private void Start()
     {
-         
+        Init();
+    }
+
+    internal void Init()
+    {
         AdjustFrictionProperties();
         rb = GetComponent<Rigidbody>();
-
     }
 
     public void CalcRpm()
