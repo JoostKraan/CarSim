@@ -201,6 +201,7 @@ public class CarManager : MonoBehaviour
 
     private void ApplyThrottle(float throttleInput)
     {
+        Debug.Log(throttleInput);
         speed = rb.velocity.magnitude;
 
         if (throttleInput == 0 && speed <= 0.2f)
