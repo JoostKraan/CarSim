@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
-    public GameObject mainMenu_Panel, carEditor_Panel, engineUpgrade_Panel;
+    public GameObject mainMenu_Panel, carEditor_Panel, engineUpgrade_Panel, inGameCanvas;
     public GameObject car_GameObject;
     public GameObject menuCam, carCams;
     public Animator animator_Garage, animator_HoodCar;
@@ -93,6 +93,7 @@ public class MainMenu : MonoBehaviour
         car_GameObject.GetComponent<CarManager>().enabled = true;
         menuCam.SetActive(false);
         carCams.SetActive(true);
+        inGameCanvas.SetActive(true);
 	}
 
     public void OnQuit() => Application.Quit();
