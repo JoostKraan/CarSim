@@ -160,7 +160,7 @@ public class CarManager : MonoBehaviour
                 
                 flHeadlight.intensity = 10.3f;
                 frHeadlight.intensity = 10.3f;
-                flSpotlight.intensity = 1;
+                flSpotlight.intensity = 1;  
                 frSpotlight.intensity = 1;
                 rlTaillight.intensity = 0.71f;
                 rrTaillight.intensity = 0.71f;
