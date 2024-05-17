@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
@@ -88,12 +89,13 @@ public class MainMenu : MonoBehaviour
 
     public void OnPlay()
 	{
-        car_GameObject.transform.position = car_StartPoint.position;
-        car_GameObject.transform.rotation = car_StartPoint.rotation;
-        car_GameObject.GetComponent<CarManager>().enabled = true;
-        menuCam.SetActive(false);
-        carCams.SetActive(true);
-        inGameCanvas.SetActive(true);
+        //car_GameObject.transform.position = car_StartPoint.position;
+        //car_GameObject.transform.rotation = car_StartPoint.rotation;
+        //car_GameObject.GetComponent<CarManager>().enabled = true;
+        //menuCam.SetActive(false);
+        //carCams.SetActive(true);
+        //inGameCanvas.SetActive(true);
+        SceneManager.LoadScene(1);
 	}
 
     public void OnQuit() => Application.Quit();

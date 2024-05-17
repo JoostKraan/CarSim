@@ -31,7 +31,11 @@ public class UpgradeScript : MonoBehaviour
     void Update()
     {
         UpgradeButtonBehaviour();
-        //if (Input.GetKeyDown(KeyCode.Space)) print(CarManager.maxSpeed);
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            print(CarManager.maxSpeed);
+            print(CarManager.accelerationRate);
+        }
     }
 
     //Hoe de upgrade button moet reageren
@@ -74,7 +78,7 @@ public class UpgradeScript : MonoBehaviour
         {
             if(MoneyManager.money >= engineUpgradeAmount)
 			{
-                //CarManager.maxSpeed += 30;
+                CarManager.maxSpeed += 30;
                 upgraded_Engine = true;
                 MoneyManager.money -= engineUpgradeAmount;
                 idleCarSound.pitch += 0.05f;
@@ -84,7 +88,7 @@ public class UpgradeScript : MonoBehaviour
 		{
             if(MoneyManager.money >= turboUpgradeAmount)
 			{
-                //CarManager
+                CarManager.accelerationRate += 200;
                 upgraded_Turbo = true;
                 MoneyManager.money -= turboUpgradeAmount;
             }

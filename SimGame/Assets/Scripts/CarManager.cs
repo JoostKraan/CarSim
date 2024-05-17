@@ -57,8 +57,8 @@ public class CarManager : MonoBehaviour
     private float currentRpm = 0;
 
     [Header("Car Stats")]
-    [SerializeField] public float maxSpeed = 100f; // Adjust maximum speed
-    [SerializeField] private float accelerationRate = 500f; // Adjust acceleration rate
+    public static float maxSpeed = 100f; // Adjust maximum speed
+    public static float accelerationRate = 500f; // Adjust acceleration rate
     [SerializeField] private float decelerationRate = 1000f; // Adjust deceleration rate
     [SerializeField] private float brakeTorque = 500f; // Adjust brake torque
     [SerializeField] private float handbrakeTorque = 1000f; // Adjust handbrake torque
@@ -67,6 +67,7 @@ public class CarManager : MonoBehaviour
     public bool controllerConnected;
     public bool isKeyPressed = false;
     bool ispressed;
+    
 
     float GetForward() => playerInput.actions["Throttle"].ReadValue<float>();
     float GetBrake() => playerInput.actions["Brake"].ReadValue<float>();
@@ -90,6 +91,8 @@ public class CarManager : MonoBehaviour
         UpdateCamera();
         AdjustFrictionProperties();
         rb = GetComponent<Rigidbody>();
+        maxSpeed = 150f;
+        accelerationRate = 1300;
     }
 
     public void Update()
