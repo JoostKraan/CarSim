@@ -4,8 +4,12 @@ using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class CarManagerTemp : MonoBehaviour
+public class CarManager : MonoBehaviour
 {
+    [Header("Laps")]
+    public List<GameObject> checkpoints;
+    public int CurTarget;
+    public int lap;
 
     [Header("States")]
     [SerializeField] public bool canDrive = false;
@@ -52,16 +56,16 @@ public class CarManagerTemp : MonoBehaviour
     [SerializeField] private float maxSpeed = 100f; // Adjust maximum speed
     [SerializeField] private float accelerationRate = 500f; // Adjust acceleration rate
     [SerializeField] private float decelerationRate = 1000f; // Adjust deceleration rate
-    [SerializeField] private float brakeTorque = 500f; // Adjust brake torque
-    [SerializeField] private float handbrakeTorque = 1000f; // Adjust handbrake torque
+    [SerializeField] private float brakeTorque = 1000f; // Adjust brake torque
+    [SerializeField] private float handbrakeTorque = 2000f; // Adjust handbrake torque
     [SerializeField] private float maxTurnangle = 50f;
-    [SerializeField]private float currentTurnangle = 0f;
+    [SerializeField] private float currentTurnangle = 0f;
 
     public float turnInput;
     public float throttleInput;
 
     float targetRotationState;
-    
+
 
     internal Rigidbody rb;
     private void Start()
@@ -197,7 +201,7 @@ public class CarManagerTemp : MonoBehaviour
         {
             float torque = accelerationRate * throttleInput;
             ApplyTorqueToWheels(torque);
-            
+
         }
         // Apply deceleration
         else if (throttleInput <= 0 && speed > 0)
