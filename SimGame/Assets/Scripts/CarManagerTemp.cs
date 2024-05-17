@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class CarManager : MonoBehaviour
+public class CarManagerTemp : MonoBehaviour
 {
     [Header("Laps")]
     public List<GameObject> checkpoints;
@@ -53,6 +53,7 @@ public class CarManager : MonoBehaviour
     [SerializeField] private int currentRpm = 0;
 
     [Header("Car Stats")]
+   
     [SerializeField] private float maxSpeed = 100f; // Adjust maximum speed
     [SerializeField] private float accelerationRate = 500f; // Adjust acceleration rate
     [SerializeField] private float decelerationRate = 1000f; // Adjust deceleration rate
@@ -70,7 +71,7 @@ public class CarManager : MonoBehaviour
     internal Rigidbody rb;
     private void Start()
     {
-        Init();
+       
     }
 
     internal void Init()
