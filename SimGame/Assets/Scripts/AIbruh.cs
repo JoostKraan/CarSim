@@ -1,11 +1,16 @@
 
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class Aibruh : CarManager
 {
     [SerializeField] Vector3 enemyDirectionLocal;
+
+    public List<GameObject> checkpoints;
+    public int CurTarget;
+    public int lap;
 
     private float speedOffset;
     private Vector3 checkpointOffset;

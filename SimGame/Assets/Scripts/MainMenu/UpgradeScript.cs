@@ -6,8 +6,9 @@ using UnityEngine.UI;
 
 public class UpgradeScript : MonoBehaviour
 {
-    public TextMeshProUGUI headText, upgradeButton_Text, moneyAmountText, upgradeDetailText;
 
+    public TextMeshProUGUI headText, upgradeButton_Text, moneyAmountText, upgradeDetailText;
+    public CarManager carManager;
     public Button upgradeButton;
 
     public GameObject upgradePanel;
@@ -30,7 +31,7 @@ public class UpgradeScript : MonoBehaviour
     void Update()
     {
         UpgradeButtonBehaviour();
-        if (Input.GetKeyDown(KeyCode.Space)) print(CarManager.maxSpeed);
+        //if (Input.GetKeyDown(KeyCode.Space)) print(CarManager.maxSpeed);
     }
 
     //Hoe de upgrade button moet reageren
@@ -73,7 +74,7 @@ public class UpgradeScript : MonoBehaviour
         {
             if(MoneyManager.money >= engineUpgradeAmount)
 			{
-                CarManager.maxSpeed += 30;
+                //CarManager.maxSpeed += 30;
                 upgraded_Engine = true;
                 MoneyManager.money -= engineUpgradeAmount;
                 idleCarSound.pitch += 0.05f;
