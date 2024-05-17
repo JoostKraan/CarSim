@@ -3997,7 +3997,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1144139374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5194,6 +5194,7 @@ MonoBehaviour:
   mainMenu_Panel: {fileID: 787454567}
   carEditor_Panel: {fileID: 846231178}
   engineUpgrade_Panel: {fileID: 2125295908}
+  inGameCanvas: {fileID: 1144139373}
   car_GameObject: {fileID: 1033241566}
   menuCam: {fileID: 1305429110}
   carCams: {fileID: 607442137}
